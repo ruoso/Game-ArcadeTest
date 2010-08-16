@@ -1,4 +1,5 @@
 package Jogo::Event::Observable;
+use mro 'c3';
 use strict;
 use warnings;
 

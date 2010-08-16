@@ -1,4 +1,5 @@
 package Jogo::Type::Point;
+use mro 'c3';
 use base 'Jogo::Object';
 use strict;
 use warnings;

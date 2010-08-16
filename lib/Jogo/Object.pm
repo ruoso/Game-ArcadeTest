@@ -1,4 +1,5 @@
 package Jogo::Object;
+use mro 'c3';
 use strict;
 use warnings;
 

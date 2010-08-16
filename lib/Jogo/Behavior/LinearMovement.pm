@@ -1,7 +1,8 @@
 package Jogo::Behavior::LinearMovement;
+use mro 'c3';
 use strict;
 use warnings;
-use base 'Jogo::Point';
+use base qw(Jogo::Point Jogo::Event::Observable);
 use aliased 'Jogo::Type::Point';
 use aliased 'Jogo::Event::Moved';
 
