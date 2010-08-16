@@ -1,31 +1,28 @@
 package Jogo::Event::Observable;
 use strict;
 use warnings;
-use Scalar::Util qw(refaddr);
-
-my %listeners;
 
 sub add_listener {
     my ($self, $e_type, $object) = @_;
-    $listener{refaddr $self}{$e_type} ||= [];
-    push @{$listener{refaddr $self}{$e_type}}, $object;
+    $self->{listener}{$e_type} ||= [];
+    push @{$self->{listener}{$e_type}}, $object;
 }
 
 sub remove_listener {
     my ($self, $e_type, $object) = @_;
-    @{$listener{refaddr $self}{$e_type}} =
+    @{$self->{listener}{$e_type}} =
       grep { $_ != $object }
-        @{$listener{refaddr $self}{$e_type}};
+        @{$self->{listener}{$e_type}};
 }
 
-sub listeners {
+sub listener {
     my ($self, $e_type) = @_;
-    return $listener{refaddr $self}{$e_type};
+    return $self->{listener}{$e_type};
 }
 
 sub fire_event {
     my ($self, $e_type, $e) = @_;
-    for $list (@{$listener{refaddr $self}{$e_type}}) {
+    for $list (@{$self->{listener}{$e_type}}) {
         eval {
             $list->"${e_type}_event_fired"($e);
         };
@@ -45,10 +42,6 @@ Jogo::Event::Observable - Role with the code for observables
 
 This is a role for objects that implements the Observable role in the
 Jogo framework.
-
-This module is built in a inside-out fashion and it doesn't provide a
-constructor. This means you can use it by just adding it to the isa of
-any object and it will just work.
 
 =head1 OBSERVER PATTERN
 
