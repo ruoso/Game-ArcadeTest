@@ -1,0 +1,5 @@
+This is a test arcade side scrolling game to serve as test-bed for a
+new game framework.
+
+The game code will be in Game::ArcadeTest and the framework code will
+be under the "Jogo" namespace (Jogo is "game" in portuguese).
