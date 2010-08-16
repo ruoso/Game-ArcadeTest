@@ -1,4 +1,4 @@
-package Jogo::Model;
+package Jogo::Event::Observable;
 use strict;
 use warnings;
 use Scalar::Util qw(refaddr);
@@ -39,20 +39,12 @@ __END__
 
 =head1 NAME
 
-Jogo::Model - Base class for model objects
+Jogo::Event::Observable - Role with the code for observables
 
 =head1 DESCRIPTION
 
-This is the base class for model objects in the Jogo framework. All
-units here are in the International System (meters, grams, newtons
-etc).
-
-The conversion from that measure units to the screen space should be
-performed by a specialized View object.
-
-The idea of model objects is to represent a simulated universe,
-independently of how they are represented to the end user. This allows
-greater code reuse and better maintainibility.
+This is a role for objects that implements the Observable role in the
+Jogo framework.
 
 This module is built in a inside-out fashion and it doesn't provide a
 constructor. This means you can use it by just adding it to the isa of
