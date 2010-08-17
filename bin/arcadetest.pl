@@ -19,7 +19,7 @@ SDL::init( SDL_INIT_EVERYTHING );
 my $display = SDL::Video::set_video_mode
   (800, 600, 16,
    SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_HWACCEL );
-my $fps = 60;
+my $fps = 30;
 
 my $surf = SDLx::Surface->new(surface => $display);
 my $sevent = SDL::Event->new();
@@ -57,6 +57,7 @@ while (1) {
 
     $controller->handle_frame($time, $now);
 
+    my $delay = (1000/$fps) - ($time - $oldtime);
     $time = SDL::get_ticks;
-    SDL::delay(1000/$fps);
+    SDL::delay($delay) if $delay > 0;
 }
