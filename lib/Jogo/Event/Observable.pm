@@ -2,35 +2,61 @@ package Jogo::Event::Observable;
 use mro 'c3';
 use strict;
 use warnings;
+use threads;
+use Thread::Queue;
+use Scalar::Util qw(refaddr);
+use Storable qw(freeze thaw);
+
+my $q = Thread::Queue->new;
+my %listeners;
 
 sub add_listener {
     my ($self, $e_type, $object) = @_;
-    $self->{listener}{$e_type} ||= [];
-    push @{$self->{listener}{$e_type}}, $object;
+    $listeners{refaddr $self}{$e_type} ||= [];
+    push @{$listeners{refaddr $self}{$e_type}}, $object;
 }
 
 sub remove_listener {
     my ($self, $e_type, $object) = @_;
-    @{$self->{listener}{$e_type}} =
+    @{$listeners{refaddr $self}{$e_type}} =
       grep { $_ != $object }
-        @{$self->{listener}{$e_type}};
+        @{$listeners{refaddr $self}{$e_type}};
 }
 
 sub listener {
     my ($self, $e_type) = @_;
-    return $self->{listener}{$e_type};
+    return $listeners{refaddr $self}{$e_type};
 }
 
 sub fire_event {
     my ($self, $e_type, $e) = @_;
-    for my $list (@{$self->{listener}{$e_type}}) {
+    $q->enqueue(freeze[refaddr $self, 'moved', $e]);
+}
+
+sub DESTROY {
+    my $self = shift;
+    delete $listeners{refaddr $self};
+}
+
+sub consume_events {
+    while (my $event = $q->dequeue) {
+        propagate_event($event);
+        last unless $q->pending;
+    }
+}
+
+sub propagate_event {
+    my $data = shift;
+    my ($refaddr, $type, $e) = @{thaw $data};
+
+    foreach my $l (@{$listeners{$refaddr}{$type}}) {
         eval {
-            my $meth = $e_type."_event_fired";
-            $list->$meth($e);
+            my $m = $type.'_event_fired';
+            $l->$m($e);
         };
         if ($@) {
-            warn "Exception ignored in event handling: ".$@;
-        }
+            warn 'Ignored failure at event handler: '.@_;
+        };
     }
 }
 

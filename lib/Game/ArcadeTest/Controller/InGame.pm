@@ -5,6 +5,11 @@ use warnings;
 use base 'Jogo::Object';
 use SDL::Event;
 use SDL::Events ':all';
+use threads;
+use threads::shared;
+use Scalar::Util qw(refaddr);
+
+my %show_thread_active :shared;
 
 use aliased 'Game::ArcadeTest::Model::Ball';
 use aliased 'Game::ArcadeTest::Model::Wall';
@@ -21,9 +26,14 @@ use constant MAP_NS => 'http://daniel.ruoso.com/categoria/perl/games-perl-7';
 my $s = XML::Compile::Schema->new('share/map.xsd');
 my $r = $s->compile('READER', pack_type(MAP_NS, 'map'),
                     sloppy_floats => 1);
+sub DESTROY {
+    my $self = shift;
+    delete $show_thread_active{refaddr $self};
+}
 
 sub _init {
     my $self = shift;
+
 
     die "Missing mapname" unless $self->{mapname};
     die "Missing main_surface" unless $self->{main_surface};
@@ -89,6 +99,11 @@ sub _init {
         push @{$self->{views}}, $wall_view;
 
     }
+
+    my $refaddr = refaddr $self;
+    $show_thread_active{refaddr $self} = 1;
+    my $thr = async { $self->show_thread($refaddr) };
+    $self->{thread} = $thr;
 
 }
 
@@ -174,12 +189,6 @@ sub handle_frame {
 		$self->reset_ball;
             }
 
-            # let's force an extra rendering here.
-            foreach my $view (@{$self->{views}}) {
-                $view->render();
-            }
-            $self->{main_surface}->flip;
-
             return $self->handle_frame($elapsed - $coll->time - 0.0001);
         }
     }
@@ -188,24 +197,29 @@ sub handle_frame {
         my $event = SDL::Event->new();
         $event->type( SDL_USEREVENT );
         SDL::Events::push_event($event);
+        delete $show_thread_active{refaddr $self};
     }
 
     $ball->time_lapse($elapsed);
 
-    foreach my $view (@{$self->{views}}) {
-        $view->render();
-    }
+}
 
-    if ($save_video) {
-        my $filename =  sprintf('/tmp/video_out/output_%010d.bmp',$frame++);
-        my $ret = SDL::Video::save_BMP( $self->main_surface->surface, $filename);
-        if ((not defined $ret) || ($ret != 0)) {
-            warn 'Error saving '.$filename.': '.SDL::get_error();
+sub show_thread {
+    my ($self, $refaddr) = @_;
+    while ($show_thread_active{$refaddr}) {
+        Jogo::Event::Observable::consume_events;
+        foreach my $view (@{$self->{views}}) {
+            $view->render();
         }
+        if ($save_video) {
+            my $filename =  sprintf('/tmp/video_out/output_%010d.bmp',$frame++);
+            my $ret = SDL::Video::save_BMP( $self->main_surface->surface, $filename);
+            if ((not defined $ret) || ($ret != 0)) {
+                warn 'Error saving '.$filename.': '.SDL::get_error();
+            }
+        }
+        $self->{main_surface}->flip;
     }
-
-    SDL::Video::flip($self->{main_surface});
-
 }
 
 use Collision::2D ':all';
