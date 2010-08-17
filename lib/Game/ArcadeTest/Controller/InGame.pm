@@ -173,6 +173,13 @@ sub handle_frame {
                 warn 'BAD BALL!';
 		$self->reset_ball;
             }
+
+            # let's force an extra rendering here.
+            foreach my $view (@{$self->{views}}) {
+                $view->render();
+            }
+            $self->{main_surface}->flip;
+
             return $self->handle_frame($elapsed - $coll->time - 0.0001);
         }
     }
