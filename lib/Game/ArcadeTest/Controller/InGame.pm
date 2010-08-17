@@ -8,6 +8,7 @@ use SDL::Events ':all';
 
 use aliased 'Game::ArcadeTest::Model::Ball';
 use aliased 'Game::ArcadeTest::Model::Wall';
+use aliased 'Game::ArcadeTest::View::Ball' => 'BallView';
 use aliased 'Jogo::View::Plane';
 use aliased 'Jogo::View::FilledRect';
 use aliased 'Jogo::View::Camera';
@@ -51,13 +52,14 @@ sub _init {
     $self->{ball}->add_listener('moved', $camera);
 
     # create the ball view
-    my $ball_view = FilledRect->new( color => 0x0000FF,
-                                     camera => $camera,
-                                     main => $self->{main_surface},
-                                     x => $self->{ball}->x - $self->{ball}->radius,
-                                     y => $self->{ball}->y - $self->{ball}->radius,
-                                     w => $self->{ball}->radius * 2,
-                                     h => $self->{ball}->radius * 2 );
+    my $ball_view = BallView->new( color => 0x0000FF,
+                                   camera => $camera,
+                                   main => $self->{main_surface},
+                                   radius => $self->{ball}->radius,
+                                   x => $self->{ball}->x - $self->{ball}->radius,
+                                   y => $self->{ball}->y - $self->{ball}->radius,
+                                   w => $self->{ball}->radius * 2,
+                                   h => $self->{ball}->radius * 2 );
     $self->{ball}->add_listener('moved', $ball_view);
 
     # now create the goal
@@ -171,8 +173,7 @@ sub handle_frame {
 
             } else {
                 warn 'BAD BALL!';
-                $ball->x_vel($ball->x_vel * -1);
-                $ball->y_vel($ball->y_vel * -1);
+		$self->reset_ball;
             }
             return $self->handle_frame($oldtime + ($coll->time*1000), $now);
         }
