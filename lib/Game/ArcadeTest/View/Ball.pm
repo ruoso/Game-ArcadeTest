@@ -11,6 +11,7 @@ sub render {
     my ($self) = @_;
     $self->SUPER::render();
 
+    $self->{intermediary} ||= [];
     my @i = @{$self->{intermediary}};
     $self->{intermediary} = [];
     foreach my $p (@i) {

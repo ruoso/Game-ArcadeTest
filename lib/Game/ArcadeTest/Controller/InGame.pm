@@ -201,7 +201,7 @@ sub handle_frame {
     }
 
     $ball->time_lapse($elapsed);
-    SDL::delay(10);
+    SDL::delay(15);
 
 }
 
