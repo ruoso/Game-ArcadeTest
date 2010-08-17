@@ -41,7 +41,7 @@ sub _init_color_object {
 
 sub _init_rect {
     my ($self) = @_;
-    $self->{sdl_rect} =
+    $self->{rect_obj} =
       SDL::Rect->new
           ( 0, 0,
             $self->{camera}->m2px($self->w),
