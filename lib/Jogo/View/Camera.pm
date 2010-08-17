@@ -6,9 +6,9 @@ use warnings;
 
 sub _init {
     my $self = shift;
-    $self->{dpi} ||= 0.096;
-    $self->{w_pixels} = 800;
-    $self->{h_pixels} = 600;
+    $self->{dpi} ||= 0.96;
+    $self->{w_pixels} ||= 800;
+    $self->{h_pixels} ||= 600;
 }
 
 sub w_pixels {

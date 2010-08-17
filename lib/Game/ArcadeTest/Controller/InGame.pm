@@ -30,8 +30,8 @@ sub _init {
     $self->{views} = [];
     $self->{ball} = Ball->new;
 
-    my $camera = Camera->new( x_pixels => $self->{main_surface}->w,
-                              y_pixels => $self->{main_surface}->h,
+    my $camera = Camera->new( w_pixels => $self->{main_surface}->w,
+                              h_pixels => $self->{main_surface}->h,
                               x => $self->{ball}->x,
                               y => $self->{ball}->y );
 
@@ -70,7 +70,8 @@ sub _init {
                                      w => 0.2,
                                      h => 0.2 );
 
-    push @{$self->{views}}, $background, $ball_view, $goal_view;
+    push @{$self->{views}},
+      $background, $ball_view, $goal_view;
 
     # now we need to build four walls, to enclose our ball.
     foreach my $rect (@{$map->{wall}}) {
