@@ -3,9 +3,22 @@ use mro 'c3';
 use strict;
 use warnings;
 use base 'Jogo::View::FilledRect';
+use SDLx::Surface;
 
 # we override this to make it use the circle coordinates as center,
 # not corner.
+
+sub _init_surface {
+    my ($self) = @_;
+    $self->SUPER::_init_surface;
+    $self->{blur_surface} =
+      SDLx::Surface->new
+          ( width  => $self->{camera}->m2px($self->w),
+            height => $self->{camera}->m2px($self->h),
+            color  => $self->{color} & 0x0000FF33,
+          );
+    1;
+}
 
 sub render {
     my ($self) = @_;
@@ -20,7 +33,7 @@ sub render {
                                                 $p->y - $self->{radius},
                                                 $self->{radius} * 2,
                                                 $self->{radius} * 2 ) );
-        $self->{surface}->blit
+        $self->{blur_surface}->blit
           ( $self->{main},
             $self->{rect_obj},
             $rect );
