@@ -29,10 +29,19 @@ my $controller = InGame->new( main_surface => $app,
 $app->add_event_handler(\&handle_event);
 $app->add_show_handler(\&handle_frame);
 
+sub finish_threads {
+    foreach(threads->list) { #(threads::joinable)
+        if($_ != threads->self) {
+            $_->detach;
+        }
+    }
+}
+
 sub handle_event {
     my $sevent = shift;
     my $type = $sevent->type;
     if ($type == SDL_QUIT) {
+        finish_threads;
         return 0;
     } elsif ($type == SDL_USEREVENT) {
         my $nextmap = shift @maps;
@@ -41,6 +50,7 @@ sub handle_event {
                                        mapname => $nextmap );
         } else {
             print 'Finished course in '.(($time - $start_time)/1000)."\n";
+            finish_threads;
             return 0;
         }
     } elsif ($controller->handle_sdl_event($sevent)) {
