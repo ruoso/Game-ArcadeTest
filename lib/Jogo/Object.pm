@@ -6,7 +6,11 @@ use warnings;
 sub new {
     my $self = shift;
     my $class = ref $self || $self;
-    return bless { @_ }, $class;
+    $self = bless { @_ }, $class;
+    $self->_init;
+    return $self;
 }
+
+sub _init {}
 
 1;
