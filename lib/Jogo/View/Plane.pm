@@ -1,4 +1,4 @@
-package BouncingBall::View::Plane;
+package Jogo::View::Plane;
 use mro 'c3';
 use strict;
 use warnings;
@@ -20,33 +20,30 @@ sub _init {
 sub _init_surface {
     my ($self) = @_;
     $self->{surface} =
-      SDL::Surface->new
-          ( SDL_SWSURFACE,
-            $self->camera->x_pixels,
-            $self->camera->y_pixels,
-            $self->main->depth,
-            0, 0, 0, 255 );
+      SDLx::Surface->new
+          ( width  => $self->{camera}->w_pixels,
+            height => $self->{camera}->h_pixels );
     return 1;
 }
 
 sub _init_color_object {
     my ($self) = @_;
-    $self->{color_object} =
+    $self->{color_obj} =
       SDL::Video::map_RGB
-          ( $self->main->surface->format,
-            ((0xFF0000 & $self->color)>>16),
-            ((0x00FF00 & $self->color)>>8),
-            0x0000FF & $self->color );
+          ( $self->{main}->format,
+            ((0xFF0000 & $self->{color})>>16),
+            ((0x00FF00 & $self->{color})>>8),
+            0x0000FF & $self->{color} );
     return 1;
 }
 
 sub _init_rect {
     my ($self) = @_;
-    $self->{sdl_rect} =
+    $self->{rect_obj} =
       SDL::Rect->new
           ( 0, 0,
-            $self->camera->x_pixels,
-            $self->camera->y_pixels );
+            $self->{camera}->w_pixels,
+            $self->{camera}->h_pixels );
     return 1;
 }
 

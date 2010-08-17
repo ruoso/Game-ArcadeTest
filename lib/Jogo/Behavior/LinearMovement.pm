@@ -2,7 +2,7 @@ package Jogo::Behavior::LinearMovement;
 use mro 'c3';
 use strict;
 use warnings;
-use base qw(Jogo::Point Jogo::Event::Observable);
+use base qw(Jogo::Type::Point Jogo::Event::Observable);
 use aliased 'Jogo::Type::Point';
 use aliased 'Jogo::Event::Moved';
 
@@ -35,7 +35,7 @@ sub time_lapse {
     my $new = Point->new(x => $x, y => $y);
 
 
-    $self->fire_event('moved', Moved->new(old => $old, new => $new));
+    $self->fire_event('moved', Moved->new(old_point => $old, new_point => $new));
     return 1;
 }
 

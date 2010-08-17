@@ -4,16 +4,16 @@ use base 'Jogo::Object';
 use strict;
 use warnings;
 
-sub old {
+sub old_point {
     my $self = shift;
-    $self->{old} = shift if @_;
-    return $self->{old};
+    $self->{old_point} = shift if @_;
+    return $self->{old_point};
 }
 
-sub new {
+sub new_point {
     my $self = shift;
-    $self->{new} = shift if @_;
-    return $self->{new};
+    $self->{new_point} = shift if @_;
+    return $self->{new_point};
 }
 
 1;

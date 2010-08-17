@@ -4,22 +4,29 @@ use base 'Jogo::Type::Point';
 use strict;
 use warnings;
 
+sub _init {
+    my $self = shift;
+    $self->{dpi} ||= 0.096;
+    $self->{w_pixels} = 800;
+    $self->{h_pixels} = 600;
+}
+
 sub w_pixels {
     my $self = shift;
     $self->{w_pixels} = shift if @_;
-    return $self->{w_pixels} || 800;
+    return $self->{w_pixels};
 }
 
 sub h_pixels {
     my $self = shift;
     $self->{h_pixels} = shift if @_;
-    return $self->{h_pixels} || 600;
+    return $self->{h_pixels};
 }
 
 sub dpi {
     my $self = shift;
     $self->{h_pixels} = shift if @_;
-    return $self->{h_pixels} || 0.96;
+    return $self->{dpi};
 }
 
 sub m2px {
@@ -56,7 +63,7 @@ sub translate_x_y {
 
 sub translate_x_y_w_h {
     my ($self, $x, $y, $w, $h) = @_;
-    my ($pix_x, $inv_y) = $self->translate_point($x, $y);
+    my ($pix_x, $inv_y) = $self->translate_x_y($x, $y);
     my $pix_h = $self->m2px($h);
     my $pix_w = $self->m2px($w);
     return ($pix_x, $inv_y - $pix_h, $pix_w, $pix_h);
@@ -93,16 +100,16 @@ sub moved_event_fired {
     my $dw_y = $self->y - ($self->h / 2);
     my $br_dw_y = $dw_y + $self->h * 0.2;
 
-    if ($ev->new->x < $br_lf_x) {
-        $self->x( $self->x - ($br_lf_x - $ev->new->x))
-    } elsif ($ev->new->x > $br_rt_x) {
-        $self->x( $self->x + ($ev->new->x - $br_rt_x));
+    if ($ev->new_point->x < $br_lf_x) {
+        $self->x( $self->x - ($br_lf_x - $ev->new_point->x))
+    } elsif ($ev->new_point->x > $br_rt_x) {
+        $self->x( $self->x + ($ev->new_point->x - $br_rt_x));
     }
 
-    if ($ev->new->y < $br_dw_y) {
-        $self->y( $self->y - ($br_dw_y - $ev->new->y))
-    } elsif ($ev->new->y > $br_up_y) {
-        $self->y( $self->y + ($ev->new->y - $br_up_y));
+    if ($ev->new_point->y < $br_dw_y) {
+        $self->y( $self->y - ($br_dw_y - $ev->new_point->y))
+    } elsif ($ev->new_point->y > $br_up_y) {
+        $self->y( $self->y + ($ev->new_point->y - $br_up_y));
     }
 
     return 1;

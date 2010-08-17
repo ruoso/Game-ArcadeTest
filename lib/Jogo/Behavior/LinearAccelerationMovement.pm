@@ -47,7 +47,7 @@ sub time_lapse {
 
     my $new = Point->new(x => $x, y => $y);
 
-    $self->fire_event('moved', Moved->new(old => $old, new => $new));
+    $self->fire_event('moved', Moved->new(old_point => $old, new_point => $new));
     return 1;
 }
 

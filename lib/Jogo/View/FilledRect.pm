@@ -1,4 +1,4 @@
-package BouncingBall::View::FilledRect;
+package Jogo::View::FilledRect;
 use mro 'c3';
 use strict;
 use warnings;
@@ -20,20 +20,17 @@ sub _init {
 sub _init_surface {
     my ($self) = @_;
     $self->{surface} =
-      SDL::Surface->new
-          ( SDL_SWSURFACE,
-            $self->camera->m2px($self->w),
-            $self->camera->m2px($self->h),
-            $self->main->depth,
-            0, 0, 0, 255 );
+      SDLx::Surface->new
+          ( width  => $self->{camera}->m2px($self->w),
+            height => $self->{camera}->m2px($self->h) );
     return 1;
 }
 
 sub _init_color_object {
     my ($self) = @_;
-    $self->{color_object} =
+    $self->{color_obj} =
       SDL::Video::map_RGB
-          ( $self->main->surface->format,
+          ( $self->{main}->surface->format,
             ((0xFF0000 & $self->color)>>16),
             ((0x00FF00 & $self->color)>>8),
             0x0000FF & $self->color );
@@ -45,8 +42,8 @@ sub _init_rect {
     $self->{sdl_rect} =
       SDL::Rect->new
           ( 0, 0,
-            $self->camera->m2px($self->w),
-            $self->camera->m2px($self->h) );
+            $self->{camera}->m2px($self->w),
+            $self->{camera}->m2px($self->h) );
     return 1;
 }
 
@@ -78,6 +75,7 @@ sub w {
         $self->_init_rect;
         $self->_fill_rect;
     }
+    return $self->{w};
 }
 
 sub h {
@@ -88,14 +86,15 @@ sub h {
         $self->_init_rect;
         $self->_fill_rect;
     }
+    return $self->{h};
 }
 
 sub render {
     my ($self) = @_;
 
     my $rect = SDL::Rect->new
-      ( $self->camera->translate_x_y_w_h( $self->x, $self->y,
-                                          $self->w, $self->h ) );
+      ( $self->{camera}->translate_x_y_w_h( $self->x, $self->y,
+                                            $self->w, $self->h ) );
     SDL::Video::blit_surface
         ( $self->{surface},
           $self->{rect_obj},
@@ -107,10 +106,8 @@ sub render {
 
 sub moved_event_fired {
     my ($self, $ev) = @_;
-    $self->$_($ev->new->$_) for
-      # this grep avoids unnecessary surface reinitializations
-      grep { $self->$_ != $ev->new->$_ }
-        qw(x y w h);
+    $self->$_($ev->new_point->$_) for
+        qw(x y);
     return 1;
 }
 

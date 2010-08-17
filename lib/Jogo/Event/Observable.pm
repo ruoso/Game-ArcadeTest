@@ -23,15 +23,18 @@ sub listener {
 
 sub fire_event {
     my ($self, $e_type, $e) = @_;
-    for $list (@{$self->{listener}{$e_type}}) {
+    for my $list (@{$self->{listener}{$e_type}}) {
         eval {
-            $list->"${e_type}_event_fired"($e);
+            my $meth = $e_type."_event_fired";
+            $list->$meth($e);
         };
         if ($@) {
             warn "Exception ignored in event handling: ".$@;
         }
     }
 }
+
+1;
 
 __END__
 
