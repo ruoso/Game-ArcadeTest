@@ -60,3 +60,4 @@ sub handle_frame {
 
 $start_time = $time = SDL::get_ticks;
 $app->run;
+
