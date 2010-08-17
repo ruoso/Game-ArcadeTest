@@ -20,9 +20,11 @@ sub _init {
 sub _init_surface {
     my ($self) = @_;
     $self->{surface} =
-      SDLx::Surface->new
-          ( width  => $self->{camera}->m2px($self->w),
-            height => $self->{camera}->m2px($self->h) );
+      SDL::Surface->new
+          ( SDL_HWSURFACE,
+            $self->{camera}->m2px($self->w),
+            $self->{camera}->m2px($self->h),
+            16, 0, 0, 0, 0);
     return 1;
 }
 

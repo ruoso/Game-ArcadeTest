@@ -187,7 +187,7 @@ sub handle_frame {
     $ball->time_lapse($oldtime/1000, $now/1000);
 
     foreach my $view (@{$self->{views}}) {
-        my $ret = $view->render();
+        $view->render();
     }
 
     if ($save_video) {
