@@ -20,15 +20,15 @@ sub y_vel {
 
 
 sub time_lapse {
-    my ($self, $old_time, $new_time) = @_;
+    my ($self, $elapsed) = @_;
 
     my $x = $self->x;
     my $y = $self->y;
 
     my $old = Point->new(x => $x, y => $y);
 
-    $x += ($new_time - $old_time) * $self->x_vel;
-    $y += ($new_time - $old_time) * $self->y_vel;
+    $x += $elapsed * $self->x_vel;
+    $y += $elapsed * $self->y_vel;
     $self->x($x);
     $self->y($y);
 

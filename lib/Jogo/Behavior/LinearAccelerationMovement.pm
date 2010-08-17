@@ -20,8 +20,7 @@ sub y_acc {
 
 
 sub time_lapse {
-    my ($self, $old_time, $new_time) = @_;
-    my $elapsed = ($new_time - $old_time);
+    my ($self, $elapsed) = @_;
 
     my $x     = $self->x;
     my $x_vel = $self->x_vel;

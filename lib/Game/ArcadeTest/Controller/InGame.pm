@@ -37,7 +37,7 @@ sub _init {
                               y => $self->{ball}->y );
 
     my $background = Plane->new( main => $self->{main_surface},
-                                 color => 0xFFFFFF,
+                                 color => 0xFFFFFFFF,
                                  camera => $camera );
 
 
@@ -52,7 +52,7 @@ sub _init {
     $self->{ball}->add_listener('moved', $camera);
 
     # create the ball view
-    my $ball_view = BallView->new( color => 0x0000FF,
+    my $ball_view = BallView->new( color => 0x0000FFFF,
                                    camera => $camera,
                                    main => $self->{main_surface},
                                    radius => $self->{ball}->radius,
@@ -64,7 +64,7 @@ sub _init {
 
     # now create the goal
     $self->{goal} = Point->new(%{$map->{goal}});
-    my $goal_view = FilledRect->new( color => 0xFFFF00,
+    my $goal_view = FilledRect->new( color => 0xFFFF00FF,
                                      camera => $camera,
                                      main => $self->{main_surface},
                                      x => $self->{goal}->x - 0.1,
@@ -81,7 +81,7 @@ sub _init {
         my $wall_model = Wall->new( %$rect );
         push @{$self->{walls}}, $wall_model;
 
-        my $wall_view = FilledRect->new( color => 0xFF0000,
+        my $wall_view = FilledRect->new( color => 0xFF0000FF,
                                          camera => $camera,
                                          main => $self->{main_surface},
                                          %$rect );
@@ -146,16 +146,14 @@ sub reset_ball {
 my $frame = 0;
 my $save_video = 0;
 sub handle_frame {
-    my ($self, $oldtime, $now) = @_;
-
-    my $frame_elapsed_time = ($now - $oldtime)/1000;
+    my ($self, $elapsed) = @_;
     my $ball = $self->{ball};
 
     foreach my $wall (@{$self->{walls}}) {
-        if (my $coll = collide($ball, $wall, $frame_elapsed_time)) {
+        if (my $coll = collide($ball, $wall, $elapsed)) {
             # need to place the ball in the result after the bounce given
             # the time elapsed after the collision.
-            $ball->time_lapse($oldtime/1000, ($oldtime/1000 + $coll->time - 0.0001));
+            $ball->time_lapse($coll->time - 0.0001);
 
             if (defined $coll->axis &&
                 $coll->axis eq 'x') {
@@ -175,17 +173,17 @@ sub handle_frame {
                 warn 'BAD BALL!';
 		$self->reset_ball;
             }
-            return $self->handle_frame($oldtime + ($coll->time*1000), $now);
+            return $self->handle_frame($elapsed - $coll->time - 0.0001);
         }
     }
 
-    if (collide_goal($ball, $self->{goal}, $frame_elapsed_time)) {
+    if (collide_goal($ball, $self->{goal}, $elapsed)) {
         my $event = SDL::Event->new();
         $event->type( SDL_USEREVENT );
         SDL::Events::push_event($event);
     }
 
-    $ball->time_lapse($oldtime/1000, $now/1000);
+    $ball->time_lapse($elapsed);
 
     foreach my $view (@{$self->{views}}) {
         $view->render();
