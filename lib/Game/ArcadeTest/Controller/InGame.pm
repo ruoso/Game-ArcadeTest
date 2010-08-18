@@ -66,7 +66,7 @@ sub _init {
     $self->{ball}->add_listener('moved', $camera);
 
     # create the ball view
-    my $ball_view = BallView->new( color => 0x0000FF01,
+    my $ball_view = BallView->new( color => 0x0000FF05,
                                    camera => $camera,
                                    main => $self->{main_surface},
                                    radius => $self->{ball}->radius,
