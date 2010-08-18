@@ -66,7 +66,7 @@ sub _init {
     $self->{ball}->add_listener('moved', $camera);
 
     # create the ball view
-    my $ball_view = BallView->new( color => 0x0000FFFF,
+    my $ball_view = BallView->new( color => 0x0000FF01,
                                    camera => $camera,
                                    main => $self->{main_surface},
                                    radius => $self->{ball}->radius,
@@ -155,11 +155,11 @@ sub handle_sdl_event {
 
     } elsif ($type == SDL_KEYDOWN &&
              $sevent->key_sym() == SDLK_a) {
-        $self->{camera}->dpi($camera_dpi *= 1.1);
+        $self->{camera}->dpi($camera_dpi *= 1.01);
 
     } elsif ($type == SDL_KEYDOWN &&
              $sevent->key_sym() == SDLK_z) {
-        $self->{camera}->dpi($camera_dpi *= 0.9);
+        $self->{camera}->dpi($camera_dpi *= 0.99);
 
     } else {
         return 0;
@@ -217,8 +217,7 @@ sub handle_frame {
     }
 
     $ball->time_lapse($elapsed);
-    SDL::delay(15);
-
+    SDL::delay(1);
 }
 
 sub show_thread {

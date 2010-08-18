@@ -11,12 +11,6 @@ use SDLx::Surface;
 sub _init_surface {
     my ($self) = @_;
     $self->SUPER::_init_surface;
-    $self->{blur_surface} =
-      SDLx::Surface->new
-          ( width  => $self->{camera}->m2px($self->w),
-            height => $self->{camera}->m2px($self->h),
-            color  => $self->{color} & 0x0000FF33,
-          );
     1;
 }
 
@@ -33,7 +27,7 @@ sub render {
                                                 $p->y - $self->{radius},
                                                 $self->{radius} * 2,
                                                 $self->{radius} * 2 ) );
-        $self->{blur_surface}->blit
+        $self->{surface}->blit
           ( $self->{main},
             $self->{rect_obj},
             $rect );
