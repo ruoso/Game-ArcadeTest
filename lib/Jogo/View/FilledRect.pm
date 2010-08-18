@@ -70,6 +70,12 @@ sub render {
     return 1;
 }
 
+sub zoomed_event_fired {
+    my $self = shift;
+    $self->_init_surface;
+    $self->_init_rect;
+}
+
 sub moved_event_fired {
     my ($self, $ev) = @_;
     $self->$_($ev->new_point->$_) for

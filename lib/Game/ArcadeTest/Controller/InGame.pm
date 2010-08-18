@@ -10,6 +10,7 @@ use threads::shared;
 use Scalar::Util qw(refaddr);
 
 my %show_thread_active :shared;
+my $camera_dpi :shared;
 
 use aliased 'Game::ArcadeTest::Model::Ball';
 use aliased 'Game::ArcadeTest::Model::Wall';
@@ -44,7 +45,10 @@ sub _init {
     my $camera = Camera->new( w_pixels => $self->{main_surface}->w,
                               h_pixels => $self->{main_surface}->h,
                               x => $self->{ball}->x,
-                              y => $self->{ball}->y );
+                              y => $self->{ball}->y,
+                            );
+    $self->{camera} = $camera;
+    $camera_dpi = $camera->{dpi};
 
     my $background = Plane->new( main => $self->{main_surface},
                                  color => 0xFFFFFFFF,
@@ -71,6 +75,8 @@ sub _init {
                                    w => $self->{ball}->radius * 2,
                                    h => $self->{ball}->radius * 2 );
     $self->{ball}->add_listener('moved', $ball_view);
+    $self->{camera}->add_listener('zoomed', $ball_view);
+
 
     # now create the goal
     $self->{goal} = Point->new(%{$map->{goal}});
@@ -81,6 +87,7 @@ sub _init {
                                      y => $self->{goal}->y - 0.1,
                                      w => 0.2,
                                      h => 0.2 );
+    $self->{camera}->add_listener('zoomed', $goal_view);
 
     push @{$self->{views}},
       $background, $ball_view, $goal_view;
@@ -95,6 +102,7 @@ sub _init {
                                          camera => $camera,
                                          main => $self->{main_surface},
                                          %$rect );
+        $self->{camera}->add_listener('zoomed', $wall_view);
 
         push @{$self->{views}}, $wall_view;
 
@@ -144,6 +152,14 @@ sub handle_sdl_event {
     } elsif ($type == SDL_KEYUP &&
              $sevent->key_sym() == SDLK_DOWN) {
         $ball->y_acc(0);
+
+    } elsif ($type == SDL_KEYDOWN &&
+             $sevent->key_sym() == SDLK_a) {
+        $self->{camera}->dpi($camera_dpi *= 1.1);
+
+    } elsif ($type == SDL_KEYDOWN &&
+             $sevent->key_sym() == SDLK_z) {
+        $self->{camera}->dpi($camera_dpi *= 0.9);
 
     } else {
         return 0;
@@ -208,6 +224,7 @@ sub handle_frame {
 sub show_thread {
     my ($self, $refaddr) = @_;
     while ($show_thread_active{$refaddr}) {
+        $self->{camera}{dpi} = $camera_dpi;
         Jogo::Event::Observable::consume_events;
         foreach my $view (@{$self->{views}}) {
             $view->render();

@@ -30,7 +30,7 @@ sub listener {
 
 sub fire_event {
     my ($self, $e_type, $e) = @_;
-    $q->enqueue(freeze[refaddr $self, 'moved', $e]);
+    $q->enqueue(freeze[refaddr $self, $e_type, $e]);
 }
 
 sub DESTROY {

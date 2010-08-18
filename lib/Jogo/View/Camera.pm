@@ -1,6 +1,6 @@
 package Jogo::View::Camera;
 use mro 'c3';
-use base 'Jogo::Type::Point';
+use base qw(Jogo::Type::Point Jogo::Event::Observable);
 use strict;
 use warnings;
 
@@ -25,7 +25,11 @@ sub h_pixels {
 
 sub dpi {
     my $self = shift;
-    $self->{h_pixels} = shift if @_;
+    if (@_) {
+        my $old = $self->{dpi};
+        $self->{dpi} = shift;
+        $self->fire_event('zoomed', { old => $old, new => $self->{dpi} });
+    }
     return $self->{dpi};
 }
 
